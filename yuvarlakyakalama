@@ -1,0 +1,245 @@
+from tkinter import *
+import random
+
+pencere = Tk()
+pencere.title("Daireyi Yakala")
+pencere.geometry("500x400")
+
+puan = 0
+en_yuksek_skor = 0
+karakter_rengi = "red"
+boyut = 40
+
+
+# ---------------- OYUN ----------------
+
+def tiklama(event):
+    global puan, en_yuksek_skor, boyut
+
+    nesneler = oyun_alani.find_overlapping(
+        event.x,
+        event.y,
+        event.x,
+        event.y
+    )
+
+    karaktere_basildi = False
+
+    for nesne in nesneler:
+        if "karakter" in oyun_alani.gettags(nesne):
+            karaktere_basildi = True
+            break
+
+    if karaktere_basildi:
+
+        puan += 1
+
+        if puan > en_yuksek_skor:
+            en_yuksek_skor = puan
+
+        skor.config(text="Puan: " + str(puan))
+        rekor.config(text="En Yüksek: " + str(en_yuksek_skor))
+
+        # HER 5 PUANDA BİR DAİRE KÜÇÜLÜR
+        if puan % 5 == 0 and boyut > 20:
+            boyut -= 5
+
+        yeni_karakter()
+
+    else:
+        oyun_bitti()
+
+
+def yeni_karakter():
+    oyun_alani.delete("karakter")
+
+    x = random.randint(10, 500 - boyut - 10)
+    y = random.randint(10, 320 - boyut)
+
+    oyun_alani.create_oval(
+        x,
+        y,
+        x + boyut,
+        y + boyut,
+        fill=karakter_rengi,
+        outline=karakter_rengi,
+        tags="karakter"
+    )
+
+
+def oyun_bitti():
+    global puan, boyut
+
+    puan = 0
+    boyut = 40
+
+    oyun_alani.delete("karakter")
+
+    oyun_ekrani.pack_forget()
+    baslangic_ekrani.pack(fill="both", expand=True)
+
+    ana_rekor.config(
+        text="En Yüksek Skor: " + str(en_yuksek_skor)
+    )
+
+
+# ---------------- KARAKTER SEÇİMİ ----------------
+
+def karakter_sec(rengi):
+    global karakter_rengi, puan, boyut
+
+    karakter_rengi = rengi
+    puan = 0
+    boyut = 40
+
+    karakter_ekrani.pack_forget()
+    oyun_ekrani.pack(fill="both", expand=True)
+
+    skor.config(text="Puan: 0")
+    rekor.config(text="En Yüksek: " + str(en_yuksek_skor))
+
+    yeni_karakter()
+
+
+# ---------------- OYUNU BAŞLAT ----------------
+
+def oyunu_baslat():
+    baslangic_ekrani.pack_forget()
+    karakter_ekrani.pack(fill="both", expand=True)
+
+
+# ---------------- ANA EKRAN ----------------
+
+baslangic_ekrani = Frame(pencere)
+baslangic_ekrani.pack(fill="both", expand=True)
+
+Label(
+    baslangic_ekrani,
+    text="DAİREYİ YAKALA",
+    font=("Arial", 28, "bold"),
+    fg="red"
+).pack(pady=60)
+
+Label(
+    baslangic_ekrani,
+    text="Hızlı ol ve daireyi yakala!",
+    font=("Arial", 13)
+).pack()
+
+ana_rekor = Label(
+    baslangic_ekrani,
+    text="En Yüksek Skor: 0",
+    font=("Arial", 18, "bold"),
+    fg="blue"
+)
+ana_rekor.pack(pady=15)
+
+Button(
+    baslangic_ekrani,
+    text="OYUNU BAŞLAT",
+    font=("Arial", 16, "bold"),
+    bg="green",
+    fg="white",
+    padx=30,
+    pady=15,
+    command=oyunu_baslat
+).pack(pady=20)
+
+
+# ---------------- KARAKTER SEÇİMİ ----------------
+
+karakter_ekrani = Frame(pencere)
+
+Label(
+    karakter_ekrani,
+    text="DAİRENİ SEÇ",
+    font=("Arial", 25, "bold")
+).pack(pady=70)
+
+Label(
+    karakter_ekrani,
+    text="Hangi renkte daire ile oynamak istiyorsun?",
+    font=("Arial", 13)
+).pack(pady=10)
+
+Button(
+    karakter_ekrani,
+    text="KIRMIZI",
+    font=("Arial", 15, "bold"),
+    bg="red",
+    fg="white",
+    width=12,
+    height=2,
+    command=lambda: karakter_sec("red")
+).pack(side=LEFT, padx=30, pady=30)
+
+Button(
+    karakter_ekrani,
+    text="MAVİ",
+    font=("Arial", 15, "bold"),
+    bg="blue",
+    fg="white",
+    width=12,
+    height=2,
+    command=lambda: karakter_sec("blue")
+).pack(side=RIGHT, padx=30, pady=30)
+
+
+# ---------------- OYUN EKRANI ----------------
+
+oyun_ekrani = Frame(pencere)
+
+# Skor bölümü
+skor_bolumu = Frame(
+    oyun_ekrani,
+    bg="white",
+    height=50
+)
+skor_bolumu.pack(fill="x")
+
+skor = Label(
+    skor_bolumu,
+    text="Puan: 0",
+    font=("Arial", 16, "bold"),
+    bg="white",
+    fg="black"
+)
+skor.pack(
+    side=LEFT,
+    padx=15,
+    pady=10
+)
+
+rekor = Label(
+    skor_bolumu,
+    text="En Yüksek: 0",
+    font=("Arial", 16, "bold"),
+    bg="white",
+    fg="blue"
+)
+rekor.pack(
+    side=RIGHT,
+    padx=15,
+    pady=10
+)
+
+
+# Oyun alanı
+oyun_alani = Canvas(
+    oyun_ekrani,
+    width=500,
+    height=350,
+    bg="white",
+    highlightthickness=0
+)
+oyun_alani.pack()
+
+oyun_alani.bind(
+    "<Button-1>",
+    tiklama
+)
+
+
+# ---------------- PROGRAM ----------------
+
+pencere.mainloop()
