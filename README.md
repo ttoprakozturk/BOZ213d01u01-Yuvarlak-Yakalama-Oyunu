@@ -9,7 +9,7 @@ Tkinter kütüphanesi kullanılarak Python ile geliştirilmiş refleks ve tıkla
 * Boş alana tıklanırsa veya süre biterse oyun sona erer ve en yüksek skor kaydedilir.
 
 ## 🛠️️ Kullanılan Teknolojiler
-* **Python 3.x**
+* **Python 3.14**
 * **Tkinter** (Python dahili grafik arayüz kütüphanesi)
 
 ## 🚀 Kurulum ve Çalıştırma
